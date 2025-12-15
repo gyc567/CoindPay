@@ -1,0 +1,438 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ========== 用户管理 ==========
+
+/// 用户模型 - 核心用户数据
+model User {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // 身份信息
+  walletAddress String?    @unique
+  email         String?    @unique
+  username      String?    @unique
+  
+  // 用户资料
+  avatar        String?
+  bio           String?
+  displayName   String?
+  
+  // 认证信息
+  verified      Boolean    @default(false)
+  verifiedAt    DateTime?
+  
+  // 关系
+  profile       UserProfile?
+  wallets       Wallet[]
+  payments      Payment[]
+  transactions  Transaction[]
+  NFTs          NFT[]
+  
+  // 时间戳
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+/// 用户资料 - 扩展用户信息
+model UserProfile {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  userId        String     @unique @db.ObjectId
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 社交信息
+  twitter       String?
+  discord       String?
+  telegram      String?
+  website       String?
+  
+  // 用户偏好
+  theme         String     @default("light")  // light, dark, auto
+  language      String     @default("en")
+  notifications Boolean    @default(true)
+  
+  // 身份验证
+  kycStatus     String     @default("unverified")  // unverified, pending, verified, rejected
+  kycData       Json?
+  
+  // 其他
+  preferredChain String?
+  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+// ========== 钱包管理 ==========
+
+/// 钱包模型 - 用户的加密钱包
+model Wallet {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  userId        String     @db.ObjectId
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 钱包信息
+  address       String
+  chain         String     // "ethereum", "solana", "base", "arbitrum", etc.
+  chainId       Int?
+  
+  // 钱包状态
+  balance       String     @default("0")    // 主币余额
+  isActive      Boolean    @default(true)
+  isPrimary     Boolean    @default(false)  // 主钱包
+  
+  // 关系
+  tokens        WalletToken[]
+  transactions  Transaction[]
+  
+  // 时间戳
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  
+  @@unique([userId, address, chain])
+  @@index([userId])
+  @@index([address])
+  @@index([chain])
+}
+
+/// 钱包代币 - 钱包中的代币余额
+model WalletToken {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  walletId      String     @db.ObjectId
+  wallet        Wallet     @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  
+  // 代币信息
+  tokenAddress  String?    // 代币合约地址（null 表示原生币）
+  symbol        String
+  decimals      Int        @default(18)
+  name          String?
+  
+  // 余额信息
+  balance       String     @default("0")
+  usdValue      String?    // USD 价值（实时）
+  
+  // 时间戳
+  lastUpdated   DateTime   @default(now())
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  
+  @@unique([walletId, tokenAddress, symbol])
+  @@index([walletId])
+}
+
+/// NFT 模型 - 用户拥有的 NFT
+model NFT {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  userId        String     @db.ObjectId
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // NFT 信息
+  contractAddress String
+  tokenId       String
+  chain         String
+  
+  // NFT 元数据
+  name          String?
+  description   String?
+  image         String?
+  metadata      Json?
+  
+  // 价值信息
+  floorPrice    String?
+  rarity        String?
+  
+  // 时间戳
+  discoveredAt  DateTime   @default(now())
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  
+  @@unique([userId, contractAddress, tokenId, chain])
+  @@index([userId])
+  @@index([chain])
+}
+
+// ========== 支付管理 ==========
+
+/// 支付记录 - 用户发起的支付
+model Payment {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  userId        String     @db.ObjectId
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 支付信息
+  amount        String
+  currency      String     // "USD", "ETH", "SOL", "USDC", etc.
+  chain         String     // 支付所在链
+  
+  // 收款人信息
+  recipientAddress String?
+  recipientEmail String?
+  
+  // 支付状态
+  status        String     @default("pending")  // pending, processing, completed, failed, cancelled
+  statusReason  String?    // 状态原因（如失败原因）
+  
+  // 交易信息
+  txHash        String?    @unique
+  blockNumber   Int?
+  
+  // 费用
+  gasFee        String?
+  totalAmount   String?    // amount + gasFee
+  
+  // 元数据
+  description   String?
+  metadata      Json?
+  
+  // 时间戳
+  initiatedAt   DateTime   @default(now())
+  processedAt   DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([chain])
+}
+
+/// 交易记录 - 所有链上交易
+model Transaction {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  userId        String     @db.ObjectId
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  walletId      String     @db.ObjectId
+  wallet        Wallet     @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  
+  // 交易信息
+  fromAddress   String
+  toAddress     String
+  amount        String
+  
+  // 链和代币
+  chain         String
+  tokenAddress  String?    // null 表示原生币
+  tokenSymbol   String?
+  decimals      Int        @default(18)
+  
+  // 交易哈希和确认
+  txHash        String     @unique
+  blockNumber   Int?
+  blockHash     String?
+  transactionIndex Int?
+  
+  // 费用信息
+  gasPrice      String?
+  gasUsed       String?
+  gasFee        String?
+  
+  // 交易状态
+  status        String     @default("pending")  // pending, confirmed, failed
+  confirmations Int        @default(0)
+  
+  // 交易类型
+  type          String     // "sent", "received", "contract_call", "swap", etc.
+  method        String?    // 调用的方法（如 swap, transfer 等）
+  
+  // 交易细节
+  input         String?
+  output        String?
+  
+  // 时间戳
+  confirmedAt   DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  
+  @@unique([txHash, chain])
+  @@index([userId])
+  @@index([walletId])
+  @@index([fromAddress])
+  @@index([toAddress])
+  @@index([chain])
+  @@index([status])
+  @@index([type])
+}
+
+// ========== DeFi 管理 ==========
+
+/// DeFi 头寸 - 用户在 DeFi 中的头寸
+model DeFiPosition {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  userId        String     @db.ObjectId
+  walletId      String     @db.ObjectId
+  
+  // 位置信息
+  protocol      String     // "compound", "lido", "aave", etc.
+  chain         String
+  
+  // 代币信息
+  tokenAddress  String
+  tokenSymbol   String
+  amount        String
+  
+  // 收益信息
+  apy           String?    // 年化收益率
+  rewards       String?    // 已获得的奖励
+  
+  // 时间戳
+  startedAt     DateTime   @default(now())
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  
+  @@index([userId])
+  @@index([protocol])
+  @@index([chain])
+}
+
+// ========== 支付配置 ==========
+
+/// 支付链配置 - 支持的支付链
+model PaymentChain {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // 链信息
+  name          String     @unique  // "ethereum", "solana", "base", etc.
+  displayName   String
+  chainId       Int?
+  chainType     String     // "EVM", "SVM", "ICP", etc.
+  
+  // 网络状态
+  isActive      Boolean    @default(true)
+  isSupported   Boolean    @default(true)
+  
+  // RPC 配置
+  rpcUrl        String?
+  explorerUrl   String?
+  
+  // 代币配置
+  nativeToken   String?    // 原生币符号，如 "ETH", "SOL"
+  decimals      Int        @default(18)
+  
+  // 元数据
+  icon          String?
+  metadata      Json?
+  
+  // 时间戳
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  @@index([isActive])
+}
+
+/// 支持的代币 - 每条链支持的代币
+model SupportedToken {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // 代币信息
+  symbol        String
+  name          String
+  contractAddress String?  // null 表示原生币
+  decimals      Int        @default(18)
+  
+  // 链信息
+  chain         String     // 关联的链
+  
+  // 代币元数据
+  logo          String?
+  description   String?
+  coingeckoId   String?    // CoinGecko 数据源 ID
+  
+  // 状态
+  isActive      Boolean    @default(true)
+  
+  // 时间戳
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  
+  @@unique([chain, contractAddress, symbol])
+  @@index([chain])
+  @@index([symbol])
+}
+
+// ========== 价格数据 ==========
+
+/// 代币价格 - 代币价格历史
+model TokenPrice {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // 代币和链
+  symbol        String
+  chain         String
+  contractAddress String?
+  
+  // 价格信息
+  price         String     // USD 价格
+  priceChange24h String?    // 24h 涨跌幅
+  marketCap     String?
+  volume24h     String?
+  
+  // 时间戳
+  timestamp     DateTime   @default(now())
+  createdAt     DateTime   @default(now())
+  
+  @@index([symbol])
+  @@index([chain])
+  @@index([timestamp])
+}
+
+// ========== 活动日志 ==========
+
+/// 活动日志 - 用户活动审计
+model ActivityLog {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  userId        String?    @db.ObjectId
+  
+  // 活动信息
+  action        String     // "login", "send_payment", "connect_wallet", etc.
+  entity        String?    // "user", "payment", "wallet", etc.
+  entityId      String?    // 相关实体 ID
+  
+  // 详情
+  description   String?
+  details       Json?
+  
+  // IP 和设备
+  ipAddress     String?
+  userAgent     String?
+  
+  // 结果
+  status        String     @default("success")  // success, failed
+  errorMessage  String?
+  
+  // 时间戳
+  createdAt     DateTime   @default(now())
+  
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ========== 系统配置 ==========
+
+/// 系统配置 - 应用配置
+model SystemConfig {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  
+  key           String     @unique
+  value         String
+  description   String?
+  type          String     @default("string")  // string, number, boolean, json
+  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}

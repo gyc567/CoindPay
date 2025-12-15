@@ -5,6 +5,7 @@ const path = require('path')
 
 const withPWA = require('next-pwa')({
   dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
 })
 
 const nextConfig = withPWA({
@@ -27,12 +28,21 @@ const nextConfig = withPWA({
       },
     ],
   },
-  webpack: config => {
+  webpack: (config, { isServer }) => {
     config.externals.push('pino-pretty', 'lokijs', 'encoding')
     config.resolve.fallback = { fs: false, net: false, tls: false }
     config.module.rules.push({
-      test: /\.svg$/,
-      use: ['@svgr/webpack', 'url-loader'],
+      test: /\.svg$/i,
+      oneOf: [
+        {
+          issuer: /\.[jt]sx?$/,
+          use: ['@svgr/webpack'],
+        },
+        {
+          type: 'asset/resource',
+          assetModuleFilename: 'static/media/[name].[hash][ext]',
+        },
+      ],
     })
     return config
   },
@@ -54,6 +64,12 @@ const nextConfig = withPWA({
     // },
   },
   eslint: { ignoreDuringBuilds: true },
+  typescript: { tsconfigPath: './tsconfig.json' },
+  productionBrowserSourceMaps: false,
+  onDemandEntries: {
+    maxInactiveAge: 60 * 60 * 1000,
+    pagesBufferLength: 5,
+  },
   async headers() {
     return [
       {

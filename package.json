@@ -11,13 +11,14 @@
   "private": true,
   "scripts": {
     "dev:vercel": "vercel env pull .env.local",
-    "dev": "cross-env npm run generate-prisma && NODE_OPTIONS='--inspect --max-old-space-size=4096' next dev",
+    "dev": "cross-env NODE_OPTIONS='--inspect --max-old-space-size=4096' next dev",
     "dev:pre": "vercel dev",
-    "build": "npm run generate-prisma && next build",
+    "build": "next build",
+    "prebuild": "prisma generate",
     "start": "next start",
     "db": "NODE_OPTIONS='--experimental-json-modules' node ./scripts/db/mongodb.mjs",
     "db:test": "node test-mongodb.js",
-    "lint": "next lint & npm run lint:prettier",
+    "lint": "next lint && npm run lint:prettier",
     "lint-staged": "lint-staged",
     "lint-staged:ts": "eslint --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint --fix --cache --ext .ts,.tsx,.js,.jsx --format=pretty ./src ",
@@ -25,7 +26,7 @@
     "lint:prettier": "prettier -c --write \"src/**/*\" --end-of-line auto",
     "postinstall": "husky install",
     "pull-prisma": "prisma db pull prisma --force",
-    "generate-prisma": "test -f prisma/schema.prisma && prisma generate || echo 'Skipping Prisma generation (no schema found)'"
+    "generate-prisma": "prisma generate"
   },
   "dependencies": {
     "@ant-design/icons": "^5.1.4",

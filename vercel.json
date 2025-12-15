@@ -3,6 +3,7 @@
   "devCommand": "next dev",
   "installCommand": "npm install --legacy-peer-deps",
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "NODE_OPTIONS": "--max-old-space-size=4096"
   }
 }

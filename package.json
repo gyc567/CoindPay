@@ -14,7 +14,6 @@
     "dev": "cross-env NODE_OPTIONS='--inspect --max-old-space-size=4096' next dev",
     "dev:pre": "vercel dev",
     "build": "next build",
-    "prebuild": "prisma generate",
     "start": "next start",
     "db": "NODE_OPTIONS='--experimental-json-modules' node ./scripts/db/mongodb.mjs",
     "db:test": "node test-mongodb.js",

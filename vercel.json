@@ -4,6 +4,7 @@
   "installCommand": "npm install --legacy-peer-deps",
   "env": {
     "NODE_ENV": "production",
-    "NODE_OPTIONS": "--max-old-space-size=4096"
+    "NODE_OPTIONS": "--max-old-space-size=4096",
+    "NEXT_PUBLIC_CDN_URL": "@next_public_cdn_url"
   }
 }

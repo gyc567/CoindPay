@@ -10,5 +10,6 @@ export default {
     ethereum: 'https://ethereum.org',
     solana: 'https://solana.com',
     base: 'https://base.org',
+    cdn: process.env.NEXT_PUBLIC_CDN_URL || '',
   },
 }

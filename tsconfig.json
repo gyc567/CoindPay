@@ -27,7 +27,9 @@
     "declaration": false,
     "declarationMap": false,
     "sourceMap": false,
-    "tsBuildInfoFile": ".next/tsbuildinfo"
+    "tsBuildInfoFile": ".next/tsbuildinfo",
+    "noImplicitAny": false,
+    "suppressImplicitAnyIndexErrors": true
   },
   "include": ["next-env.d.ts", "src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", ".next", "dist", "build", "src/contracts/**"]

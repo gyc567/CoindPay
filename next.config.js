@@ -40,7 +40,9 @@ const nextConfig = withPWA({
         },
         {
           type: 'asset/resource',
-          assetModuleFilename: 'static/media/[name].[hash][ext]',
+          generator: {
+            filename: 'static/media/[name].[hash][ext]',
+          },
         },
       ],
     })

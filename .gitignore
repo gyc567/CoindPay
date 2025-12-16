@@ -53,11 +53,6 @@ artifacts
 /public
 /scripts
 /src/middlewares
-/src/components/nm*
-/src/components/l*
-/src/components/p*
-/src/components/c*
-/src/components/d*
 /src/contracts
 /src/services
 /src/lib/api

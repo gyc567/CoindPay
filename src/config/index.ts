@@ -11,5 +11,6 @@ export default {
     solana: 'https://solana.com',
     base: 'https://base.org',
     cdn: process.env.NEXT_PUBLIC_CDN_URL || '',
+    dev: 'http://localhost:3000',
   },
 }

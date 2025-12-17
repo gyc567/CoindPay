@@ -9,9 +9,7 @@ interface HeaderProps {
 export default function Header({ customClass = '', buttonClass = '', children }: HeaderProps) {
   return (
     <header className={customClass}>
-      <nav className={buttonClass}>
-        {children}
-      </nav>
+      <nav className={buttonClass}>{children}</nav>
     </header>
   )
 }

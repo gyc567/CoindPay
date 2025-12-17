@@ -36,12 +36,7 @@ const ChainsMobile: FC<ChainsMobileProps> = () => {
           }, 300)
         }}
       />
-      <div
-        className={classNames(
-          'fixed bottom-0 left-0 w-full z-[1001]',
-          'visible'
-        )}
-      >
+      <div className={classNames('fixed bottom-0 left-0 w-full z-[1001]', 'visible')}>
         <div
           className={classNames(
             ...className('relative max-sm:origin-bottom origin-top ease-scale-cub', leaveAnimate, enterAnimate)

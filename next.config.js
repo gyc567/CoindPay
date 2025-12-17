@@ -6,6 +6,14 @@ const path = require('path')
 const withPWA = require('next-pwa')({
   dest: 'public',
   disable: process.env.NODE_ENV === 'development',
+  // 添加缓存清理和重新验证策略
+  register: true,
+  skipWaiting: true,
+  clientsClaim: true,
+  navigateFallback: '/',
+  navigateFallbackAllowlist: [/^\/(?!\/)/, /\/manifest\.webmanifest$/],
+  // 禁用 PWA 在不同域名间的缓存冲突
+  publicExcludes: ['!sw.js', '!workbox-*.js'],
 })
 
 const nextConfig = withPWA({
@@ -74,16 +82,28 @@ const nextConfig = withPWA({
   },
   async headers() {
     return [
+      // API CORS 头
       {
         source: '/api/:path*',
         headers: [
           { key: 'Access-Control-Allow-Credentials', value: 'true' },
           { key: 'Access-Control-Allow-Origin', value: '*' },
           { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS,PATCH,DELETE,POST,PUT' },
-          {
-            key: 'Access-Control-Allow-Headers',
-            value: '*',
-          },
+          { key: 'Access-Control-Allow-Headers', value: '*' },
+        ],
+      },
+      // 静态资源缓存策略 - 长期缓存
+      {
+        source: '/static/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      // 页面缓存策略 - 24小时缓存
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=86400, s-maxage=86400' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
         ],
       },
     ]

@@ -2,6 +2,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Script from 'next/script'
 import type { AppProps } from 'next/app'
+import { useEffect } from 'react'
 import ChainsMobile from '@/components/card-group/chains-card/chains-mobile'
 import { GlobalContextProvider } from '@/components/context'
 import { Analytics } from '@vercel/analytics/react'
@@ -17,8 +18,49 @@ import '@/styles/index.scss'
 
 const { title, mission } = config
 
+/**
+ * 环境变量校验函数
+ * 在开发环境中验证关键的环境变量是否配置正确
+ */
+const validateEnvironmentVariables = () => {
+  if (config.env.isDevelopment) {
+    const warnings: string[] = []
+
+    // 检查 Web3 配置
+    if (!config.web3.walletConnectId || config.web3.walletConnectId === '3d12101dba08549e9b5eb1d59b5d1fbe') {
+      warnings.push('⚠️ NEXT_PUBLIC_WALLET_CONNECT_ID 未配置或使用默认值')
+    }
+
+    if (!config.web3.quicknodeId || config.web3.quicknodeId === 'QN_fad03d5999c146c1aa10eb66ab3852b8') {
+      warnings.push('⚠️ NEXT_PUBLIC_QUICKNODE_ID 未配置或使用默认值')
+    }
+
+    // 检查 API 配置
+    if (!config.api.url) {
+      warnings.push('⚠️ NEXT_PUBLIC_API_URL 未配置')
+    }
+
+    // 检查 CDN 配置
+    if (!config.domains.cdn) {
+      warnings.push('⚠️ NEXT_PUBLIC_CDN_URL 未配置')
+    }
+
+    // 输出警告
+    if (warnings.length > 0) {
+      console.warn('🔍 CoindPay 环境变量配置检查：')
+      warnings.forEach(warn => console.warn(warn))
+    }
+  }
+}
+
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
+
+  // 应用启动时验证环境变量
+  useEffect(() => {
+    validateEnvironmentVariables()
+  }, [])
+
   return (
     <>
       <Head>

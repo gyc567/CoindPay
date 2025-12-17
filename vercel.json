@@ -5,6 +5,9 @@
   "env": {
     "NODE_ENV": "production",
     "NODE_OPTIONS": "--max-old-space-size=4096",
-    "NEXT_PUBLIC_CDN_URL": ""
+    "NEXT_PUBLIC_CDN_URL": "https://coind-pay.vercel.app",
+    "NEXT_PUBLIC_API_URL": "https://coind-pay.vercel.app",
+    "NEXT_PUBLIC_WALLET_CONNECT_ID": "3d12101dba08549e9b5eb1d59b5d1fbe",
+    "NEXT_PUBLIC_QUICKNODE_ID": "QN_fad03d5999c146c1aa10eb66ab3852b8"
   }
 }

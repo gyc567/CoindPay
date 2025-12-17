@@ -40,24 +40,6 @@ const nextConfig = withPWA({
     config.externals.push('pino-pretty', 'lokijs', 'encoding')
     config.resolve.fallback = { fs: false, net: false, tls: false }
 
-    // 修复 @vanilla-extract/css 问题
-    const newAlias = {
-      ...config.resolve.alias,
-    }
-
-    // 尝试解析 vanilla-extract/recipe，如果失败则跳过
-    try {
-      newAlias['@vanilla-extract/css/recipe'] = require.resolve('@vanilla-extract/css/recipe')
-    } catch (e) {
-      // vanilla-extract/recipe 模块不存在，将其标记为外部模块
-      if (!config.externals) {
-        config.externals = []
-      }
-      config.externals.push('@vanilla-extract/css/recipe')
-    }
-
-    config.resolve.alias = newAlias
-
     config.module.rules.push({
       test: /\.svg$/i,
       oneOf: [

@@ -3,12 +3,15 @@ import Head from 'next/head'
 import Script from 'next/script'
 import type { AppProps } from 'next/app'
 import { useEffect } from 'react'
-import ChainsMobile from '@/components/card-group/chains-card/chains-mobile'
+import dynamic from 'next/dynamic'
 import { GlobalContextProvider } from '@/components/context'
 import { Analytics } from '@vercel/analytics/react'
 import NmMetaHead from '@/components/nm-meta-head'
 
 import config from '@/config'
+
+// 动态导入 ChainsMobile 以避免在构建时编译 rainbowkit
+const ChainsMobile = dynamic(() => import('@/components/card-group/chains-card/chains-mobile'), { ssr: false })
 
 import 'animate.css'
 import 'swiper/css'

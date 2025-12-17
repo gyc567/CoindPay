@@ -41,8 +41,10 @@ const nextConfig = withPWA({
     config.resolve.fallback = { fs: false, net: false, tls: false }
 
     // 修复 @vanilla-extract/css 问题
-    if (config.resolve.alias) {
-      config.resolve.alias['@vanilla-extract/css/recipe'] = '@vanilla-extract/css/recipe'
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@vanilla-extract/css': '@vanilla-extract/css',
+      '@vanilla-extract/css/recipe': require.resolve('@vanilla-extract/css/recipe'),
     }
 
     config.module.rules.push({

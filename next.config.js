@@ -39,6 +39,12 @@ const nextConfig = withPWA({
   webpack: (config, { isServer }) => {
     config.externals.push('pino-pretty', 'lokijs', 'encoding')
     config.resolve.fallback = { fs: false, net: false, tls: false }
+
+    // 修复 @vanilla-extract/css 问题
+    if (config.resolve.alias) {
+      config.resolve.alias['@vanilla-extract/css/recipe'] = '@vanilla-extract/css/recipe'
+    }
+
     config.module.rules.push({
       test: /\.svg$/i,
       oneOf: [
@@ -63,7 +69,15 @@ const nextConfig = withPWA({
   experimental: {
     esmExternals: true,
   },
-  transpilePackages: ['ahooks', '@connect2ic/react', '@connect2ic/core', '@dfinity/principal'],
+  transpilePackages: [
+    'ahooks',
+    '@connect2ic/react',
+    '@connect2ic/core',
+    '@dfinity/principal',
+    '@vanilla-extract/css',
+    '@vanilla-extract/sprinkles',
+    '@rainbow-me/rainbowkit',
+  ],
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
   },

@@ -22,8 +22,9 @@ export default function QrCode({
   propsId = 'QrCode',
   ...props
 }) {
-  if (!(path || url)) return
   const origin = useLocation('origin')
+
+  if (!(path || url)) return
 
   let domain = env?.isDev ? domains.dev : origin
 

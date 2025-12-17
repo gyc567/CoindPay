@@ -6,4 +6,3 @@ export type AppState = {
 }
 
 export const store = {}
-

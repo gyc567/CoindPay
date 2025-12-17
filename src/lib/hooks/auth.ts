@@ -6,4 +6,3 @@ export const useAuth = () => {
     logout: async () => {},
   }
 }
-

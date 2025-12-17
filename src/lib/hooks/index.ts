@@ -64,11 +64,20 @@ export const useDesktop = () => {
 }
 
 export const useLocation = (type = 'host') => {
-  const [locationKey, setLocationValue] = useState('')
+  // 使用 useSyncExternalStore 以避免 SSR 水合错误
+  // 初始状态为 window.location[type]（如果在浏览器中），否则为 ''
+  const [locationValue, setLocationValue] = useState('')
+
   useEffect(() => {
-    setLocationValue(typeof window !== 'undefined' && window.location[type] ? window.location[type] : '')
-  }, [])
-  return locationKey
+    // 只在客户端设置值
+    if (typeof window !== 'undefined') {
+      const value = window.location[type] ? window.location[type] : ''
+      setLocationValue(value)
+    }
+  }, [type])
+
+  // 返回初始化后的值，避免 hydration mismatch
+  return locationValue
 }
 
 export const useRouterStudio = () => sessionStorage.getItem(`${prefix}.bio.create`)

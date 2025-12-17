@@ -17,38 +17,40 @@ const ChainsMobile: FC<ChainsMobileProps> = () => {
 
   useEffect(() => {
     setOpen(chainsExpand)
-  }, [chainsExpand])
+  }, [chainsExpand, setOpen])
+
+  // 只在移动设备且打开时渲染
+  if (!isMobile || !chainsExpand) {
+    return null
+  }
 
   return (
-    isMobile &&
-    chainsExpand && (
-      <>
-        <Backdrop
-          open
-          className="backdrop-blur-sm z-999 fixed"
-          onClick={() => {
-            setOpen(false)
-            setTimeout(() => {
-              setChainsExpand(false)
-            }, 300)
-          }}
-        />
+    <>
+      <Backdrop
+        open
+        className="backdrop-blur-sm z-999 fixed"
+        onClick={() => {
+          setOpen(false)
+          setTimeout(() => {
+            setChainsExpand(false)
+          }, 300)
+        }}
+      />
+      <div
+        className={classNames(
+          'fixed bottom-0 left-0 w-full z-[1001]',
+          'visible'
+        )}
+      >
         <div
           className={classNames(
-            'fixed bottom-0 left-0 w-full z-[1001]',
-            isMobile && chainsExpand ? 'visible' : 'invisible'
+            ...className('relative max-sm:origin-bottom origin-top ease-scale-cub', leaveAnimate, enterAnimate)
           )}
         >
-          <div
-            className={classNames(
-              ...className('relative max-sm:origin-bottom origin-top ease-scale-cub', leaveAnimate, enterAnimate)
-            )}
-          >
-            <ChainsMenu setChainsExpand={setChainsExpand} chainsExpand={chainsExpand} />
-          </div>
+          <ChainsMenu setChainsExpand={setChainsExpand} chainsExpand={chainsExpand} />
         </div>
-      </>
-    )
+      </div>
+    </>
   )
 }
 

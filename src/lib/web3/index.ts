@@ -52,13 +52,13 @@ export const getNFTOrScanUrl = ({
     case 'scan':
       if (_svm || _sol) return `https://solscan.io${_solExplorer}`
       if (_soon) return getSoonExplorerUrl()
-      return `${chainIdToNetWork(_chainId).blockExplorers?.default?.url}/nft/${contractAddress}/${tokenId}`
+      return `${chainIdToNetWork[_chainId]}/nft/${contractAddress}/${tokenId}`
       break
 
     case 'tx':
       if (_svm || _sol) return `https://solscan.io/tx/${hash}${_solExplorer}`
       if (_soon) return `${getSoonExplorerUrl()}/tx/${hash}`
-      return `${chainIdToNetWork(_chainId).blockExplorers?.default?.url}/tx/${hash}`
+      return `${chainIdToNetWork[_chainId]}/tx/${hash}`
       break
 
     case 'address':
@@ -68,7 +68,7 @@ export const getNFTOrScanUrl = ({
           ? `${getSoonExplorerUrl()}/address/${contractAddress || address}`
           : `${location?.origin}/wallet/${contractAddress || address}`
       if (_icp) return `https://dashboard.internetcomputer.org/account/${address}`
-      return `${chainIdToNetWork(_chainId).blockExplorers?.default?.url}/address/${address}`
+      return `${chainIdToNetWork[_chainId]}/address/${address}`
       break
 
     case 'block':
@@ -126,12 +126,12 @@ export const getActiveChain = ({ name = null, chainId = null }) => {
   if (!name && !chainId) return
   return {
     icon:
-      _supportChains().find(
+      _supportChains.find(
         row =>
           (name && (getCompareIgnoreCase(name, row?.name) || getIncludesIgnoreCase(name, row?.name))) ||
-          (chainId && chainId == row?.chain?.id)
+          (chainId && chainId == row?.chainId)
       )?.icon ||
-      `https://icons.llamao.fi/icons/chains/rsz_${((name && name?.split(' ')[0]) || (chainId && _supportChains().find(row => chainId == row?.chain?.id)?.name))?.toLowerCase()}?w=100&h=100`,
+      `https://icons.llamao.fi/icons/chains/rsz_${((name && name?.split(' ')[0]) || (chainId && _supportChains.find(row => chainId == row?.chainId)?.name))?.toLowerCase()}?w=100&h=100`,
   }
 }
 

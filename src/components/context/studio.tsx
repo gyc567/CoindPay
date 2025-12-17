@@ -1,13 +1,20 @@
 import { createContext, useContext, ReactNode, useState } from 'react'
 
 interface StudioContextType {
-  isStudioMode?: boolean
-  setIsStudioMode?: (value: boolean) => void
-  chainsExpand?: boolean
-  setChainsExpand?: (value: boolean) => void
+  isStudioMode: boolean
+  setIsStudioMode: (value: boolean) => void
+  chainsExpand: boolean
+  setChainsExpand: (value: boolean) => void
 }
 
-const StudioContext = createContext<StudioContextType>({})
+const defaultContextValue: StudioContextType = {
+  isStudioMode: false,
+  setIsStudioMode: () => {},
+  chainsExpand: false,
+  setChainsExpand: () => {},
+}
+
+const StudioContext = createContext<StudioContextType>(defaultContextValue)
 
 export function StudioProvider({ children }: { children: ReactNode }) {
   const [isStudioMode, setIsStudioMode] = useState(false)
@@ -20,10 +27,10 @@ export function StudioProvider({ children }: { children: ReactNode }) {
   )
 }
 
-export function useStudioContext() {
+export function useStudioContext(): StudioContextType {
   const context = useContext(StudioContext)
   if (!context) {
-    return {}
+    throw new Error('useStudioContext must be used within StudioProvider')
   }
   return context
 }

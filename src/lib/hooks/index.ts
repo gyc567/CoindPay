@@ -6,7 +6,7 @@
  * @Last Modified by: 0x3Anthony
  * @Last Modified time: 2025-03-03 21:36:21
  */
-import { RefObject, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import React, { RefObject, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { useMediaQuery, useTheme } from '@mui/material'
 import { useAccount, useChains } from 'wagmi'
@@ -108,7 +108,7 @@ export const useGlobalWalletConnect = () => {
 
   const [globalWalletConnect, setWalletConnect] = useState<boolean>()
   useEffect(() => {
-    return setWalletConnect(Boolean(address && chainType))
+    setWalletConnect(Boolean(address && chainType))
   }, [address, chainType])
 
   return globalWalletConnect
@@ -124,8 +124,8 @@ export const useEVMWalletConnect = () => {
   const [evmWalletConnect, setEVMWalletConnect] = useState<boolean>()
   useEffect(() => {
     let status = Boolean(account?.address && chains.find(row => row.id == account?.chainId))
-    return setEVMWalletConnect(status)
-  }, [evmWalletConnect, account?.address, account?.chainId])
+    setEVMWalletConnect(status)
+  }, [account?.address, account?.chainId, chains])
   return evmWalletConnect
 }
 

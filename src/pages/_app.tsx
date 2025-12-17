@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Script from 'next/script'
+import type { AppProps } from 'next/app'
 import ChainsMobile from '@/components/card-group/chains-card/chains-mobile'
 import { GlobalContextProvider } from '@/components/context'
 import { Analytics } from '@vercel/analytics/react'
@@ -16,7 +17,7 @@ import '@/styles/index.scss'
 
 const { title, mission } = config
 
-export default function App({ Component, pageProps }) {
+export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   return (
     <>

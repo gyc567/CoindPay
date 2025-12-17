@@ -3,6 +3,13 @@ export const env = {
   NEXT_PUBLIC_CDN_URL: process.env.NEXT_PUBLIC_CDN_URL || '',
   NEXT_PUBLIC_QUICKNODE_ID: process.env.NEXT_PUBLIC_QUICKNODE_ID || '',
   NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID || '',
+  walletConnectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_ID || '',
+  alchemyId: process.env.NEXT_PUBLIC_ALCHEMY_ID || '',
+  thirdwebKey: process.env.NEXT_PUBLIC_THIRDWEB_KEY || '',
+  rpc1Key: process.env.NEXT_PUBLIC_RPC1_KEY || '',
+  apiJwtSecret: process.env.API_JWT_SECRET || 'your-secret-key-32-chars-minimum',
+  gaId: process.env.NEXT_PUBLIC_GA_ID || '',
+  quicknodeId: process.env.NEXT_PUBLIC_QUICKNODE_ID || '',
   isDev: process.env.NODE_ENV === 'development',
   isProduction: process.env.NODE_ENV === 'production',
 }

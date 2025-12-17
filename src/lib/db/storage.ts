@@ -25,7 +25,7 @@ export const setCookie = (token: string, res: NextApiResponse) => {
   res.setHeader('Set-Cookie', cookieString)
 }
 
-export function getCookies(req) {
+export function getCookies(req: NextApiRequest): Record<string, string> {
   return req.headers.cookie ? parse(req.headers.cookie) : {}
 }
 

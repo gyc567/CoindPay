@@ -10,13 +10,15 @@ import NmMetaHead from '@/components/nm-meta-head'
 
 import config from '@/config'
 
-// 动态导入 ChainsMobile 以避免在构建时编译 rainbowkit
-const ChainsMobile = dynamic(() => import('@/components/card-group/chains-card/chains-mobile'), { ssr: false })
+// 注意：ChainsMobile 暂时被禁用以解决 rainbowkit vanilla-extract 编译兼容性问题
+// TODO: 在修复 rainbowkit 依赖后重新启用
+// const ChainsMobile = dynamic(() => import('@/components/card-group/chains-card/chains-mobile'), { ssr: false })
 
 import 'animate.css'
 import 'swiper/css'
 import 'swiper/css/scrollbar'
-import '@rainbow-me/rainbowkit/styles.css'
+// 暂时注释 rainbowkit 导入，以避免编译错误
+// import '@rainbow-me/rainbowkit/styles.css'
 import '@/styles/index.scss'
 
 const { title, mission } = config
@@ -113,7 +115,8 @@ export default function App({ Component, pageProps }: AppProps) {
       <GlobalContextProvider>
         <Component {...pageProps} />
         <Analytics />
-        <ChainsMobile />
+        {/* ChainsMobile 暂时禁用 - 待 rainbowkit 兼容性修复后重新启用 */}
+        {/* <ChainsMobile /> */}
       </GlobalContextProvider>
     </>
   )
